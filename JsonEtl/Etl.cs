@@ -12,11 +12,14 @@ namespace JsonEtl
     {
         private string _path;
         public List<string> Rows { get; set; }
+        public List<TransformationResult> TransformedRows { get; set; }
         
         public Etl(string path)
         {
             _path = path;
+
             Rows = new List<string>();
+            TransformedRows = new List<TransformationResult>();
         }
 
         public void Extract()
@@ -28,7 +31,7 @@ namespace JsonEtl
             int datumNum = 1;
             foreach (var f in files)
             {
-                Console.WriteLine("Extract " + f);
+                //Console.WriteLine("Extract " + f);
 
                 string content = File.ReadAllText(f);
 
@@ -47,5 +50,18 @@ namespace JsonEtl
                 recordNum += 1;
             }
         }
+
+        public void Transform(Func<string, TransformationResult> Transformer)
+        {
+            foreach(var d in Rows)
+            {
+                var result = Transformer(d);
+                if (result.Include)
+                {
+                    TransformedRows.Add(result);
+                }
+            }
+        }
+
     }
 }
