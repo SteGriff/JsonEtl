@@ -8,10 +8,27 @@ namespace JsonEtl
 {
     class Program
     {
+        static string path;
+        static string filter;
+        static bool recursive;
+
         static void Main(string[] args)
         {
-            var etl = new Etl("C:\\Users\\stephen\\OneDrive\\Documents\\Web\\SGUK\\SGN\\upblog\\posts");
-            etl.Extract();
+            var options = new Options();
+            if (CommandLine.Parser.Default.ParseArguments(args, options))
+            {
+                path = options.path;
+                filter = options.filter;
+                recursive = options.recursive;
+            }
+            else
+            {
+                Console.ReadKey(); // IMPORTANT: Remove when code finished
+                Environment.Exit(0);
+            }
+
+            var etl = new Etl(path);
+            etl.Extract(filter, recursive);
 
             //foreach (var line in etl.Rows)
             //{
