@@ -22,10 +22,9 @@ namespace JsonEtl
             TransformedRows = new List<TransformationResult>();
         }
 
-        public void Extract()
+        public void Extract(string filter, bool recursive)
         {
-            //TODO Allow user to specify filter and recursiveness
-            var files = Directory.EnumerateFiles(_path, "*.json", SearchOption.TopDirectoryOnly);
+            var files = Directory.EnumerateFiles(_path, filter, recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
 
             int recordNum = 1;
             int datumNum = 1;
