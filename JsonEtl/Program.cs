@@ -14,7 +14,6 @@ namespace JsonEtl
             var options = new Options();
             if (!CommandLine.Parser.Default.ParseArguments(args, options))
             {
-                Console.WriteLine("Command line parse error");
                 Environment.Exit(0);
             }
 
