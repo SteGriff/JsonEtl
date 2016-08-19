@@ -3,48 +3,75 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace JsonEtl
 {
     class Program
     {
-        static string path;
-        static string filter;
-        static bool recursive;
-
         static void Main(string[] args)
         {
             var options = new Options();
-            if (CommandLine.Parser.Default.ParseArguments(args, options))
+            if (!CommandLine.Parser.Default.ParseArguments(args, options))
             {
-                path = options.path;
-                filter = options.filter;
-                recursive = options.recursive;
-            }
-            else
-            {
-                Console.ReadKey(); // IMPORTANT: Remove when code finished
+                Console.WriteLine("Command line parse error");
                 Environment.Exit(0);
             }
 
-            var etl = new Etl(path);
-            etl.Extract(filter, recursive);
+            bool print = (options.outfile == null);
 
-            //foreach (var line in etl.Rows)
-            //{
-            //    Console.WriteLine(line);
-            //}
+            //Extract
+            var etl = new Etl(options.path);
+            etl.Extract(options.filter, options.recursive);
 
-            //Console.ReadLine();
+            var sb = new StringBuilder();
 
-            etl.Transform(MyTransformer);
-
-            foreach (var line in etl.TransformedRows)
-            {
-                Console.WriteLine(line.Data);
+            // (Echo)
+            if (options.echo)
+            { 
+                foreach (var line in etl.Rows)
+                {
+                    if (print)
+                    {
+                        Console.WriteLine(line);
+                    }
+                    else
+                    {
+                        sb.AppendLine(line);
+                    }
+                }
             }
 
-            Console.ReadLine();
+            //Transform
+            etl.Transform(MyTransformer);
+
+            // Output/Load I suppose
+
+            foreach (TransformationResult resultLine in etl.TransformedRows)
+            {
+                if (print)
+                {
+                    Console.WriteLine(resultLine.Data);
+                }
+                else
+                {
+                    sb.AppendLine(resultLine.Data);
+                }
+            }
+
+            if (!print)
+            {
+                string output = sb.ToString();
+
+                try
+                {
+                    File.WriteAllText(options.outfile, output);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error: " + ex.Message);
+                }
+            }
 
         }
 

@@ -1,11 +1,5 @@
 ﻿using CommandLine;
 using CommandLine.Text;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 
 namespace JsonEtl
 {
@@ -19,6 +13,12 @@ namespace JsonEtl
 
         [Option('r', "recursive", DefaultValue = false, HelpText = "Get files recursively rather than using the top directory only.")]
         public bool recursive { get; set; }
+
+        [Option('o', "outfile", DefaultValue = null, HelpText = "Output results to this file path instead of printing to console")]
+        public string outfile { get; set; }
+
+        [Option('e', "echo", DefaultValue = false, HelpText = "Echo the pre-transformed records as CSVs")]
+        public bool echo { get; set; }
 
         [ParserState]
         public IParserState LastParserState { get; set; }
